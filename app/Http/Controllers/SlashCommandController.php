@@ -19,5 +19,7 @@ class SlashCommandController extends Controller
 
         Log::debug('We are not doing anything with this command at this ' .
             'moment.');
+
+        return response('', 200);
     }
 }

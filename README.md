@@ -146,6 +146,8 @@ Write the `execute` member of the `SlashCommandController`:
 
         Log::debug('We are not doing anything with this command at this ' .
             'moment.');
+
+        return response('', 200);
     }
 ```
 
