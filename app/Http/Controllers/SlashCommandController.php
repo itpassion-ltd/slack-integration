@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Concerns\BindsSlackUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class SlashCommandController extends Controller
 {
+    use BindsSlackUser;
+
     public function execute(Request $request)
     {
         Log::info(__METHOD__);
+
+        if(($response = $this->actAsSlackUser($request)) !== TRUE) {
+            return $response;
+        }
 
         Log::debug('Slack sent us the following information:');
         $input = $request->all();
@@ -17,9 +24,8 @@ class SlashCommandController extends Controller
             Log::debug('"' . $key . '" = "' . $value . '"');
         }
 
-        Log::debug('We are not doing anything with this command at this ' .
-            'moment.');
+        // Execute the command...
 
-        return response('', 200);
+        return response('Command executed!', 200);
     }
 }

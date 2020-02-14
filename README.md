@@ -115,7 +115,8 @@ https://www.slack-integration.test.itpassion.com/slack/slash/command.
 Our web application does not have this route configured yet, but we will get
 there in a minute.
 
-For now, just provide the required information and click "Save". 
+For now, just provide the required information and click "Save". Be sure you
+enable "Escape channels, users, and links sent to your app". 
 
 ### Setup the route in the Laravel Application
 
@@ -164,3 +165,38 @@ automatically by Forge.
 
 Next, in the application management dashboard on Slack, mare sure to install the
 application into the desired Slack workspace.
+
+Then, in Slack, type
+```slack
+/slack-integration subcommand options arguments
+```
+
+You will see in the `laravel.log` that Slack was successful submitting the
+information to your Web Application:
+```text
+[2020-02-14 13:04:59] production.INFO: App\Http\Controllers\SlashCommandController::execute  
+[2020-02-14 13:04:59] production.DEBUG: Slack sent us the following information:  
+[2020-02-14 13:04:59] production.DEBUG: "token" = "J4cXFWHeQzNavnKOA6PZ7kC5"  
+[2020-02-14 13:04:59] production.DEBUG: "team_id" = "TU2DX68G7"  
+[2020-02-14 13:04:59] production.DEBUG: "team_domain" = "itpassionltd"  
+[2020-02-14 13:04:59] production.DEBUG: "channel_id" = "CU2Q4S63G"  
+[2020-02-14 13:04:59] production.DEBUG: "channel_name" = "slack-integration"  
+[2020-02-14 13:04:59] production.DEBUG: "user_id" = "UU0HZ2A1W"  
+[2020-02-14 13:04:59] production.DEBUG: "user_name" = "guus.leeuw"  
+[2020-02-14 13:04:59] production.DEBUG: "command" = "/slack-integration"  
+[2020-02-14 13:04:59] production.DEBUG: "text" = "command options argument"  
+[2020-02-14 13:04:59] production.DEBUG: "response_url" = "https://hooks.slack.com/commands/TU2DX68G7/941203127267/D4Gy8JftTKK1jS2Rgufra81T"  
+[2020-02-14 13:04:59] production.DEBUG: "trigger_id" = "952691517893.954473212551.4e6d9cc10a41abf89d9bb8cce5872e0f"  
+[2020-02-14 13:04:59] production.DEBUG: We are not doing anything with this command at this moment.  
+```
+
+### Mapping Slack users to Application users
+
+Unless your application is going to a benign information that provides public
+knowledge (such as a weather report app), you want to make sure that you can
+identify the Slack user and map that to a `User` model inside your application,
+so that the application can run the command under the appropriate authorization
+levels.
+
+First of all, the Controller responding to the in-coming Slash Command must
+verify whether or not  
