@@ -1,78 +1,153 @@
-<p align="center"><img src="https://res.cloudinary.com/dtfbvvkyp/image/upload/v1566331377/laravel-logolockup-cmyk-red.svg" width="400"></p>
+# Slack Integration
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+## Introduction
 
-## About Laravel
+This document describes how one can integrate a Laravel App into Slack. It
+provides step-by-step details as to what to do and how to make it work together.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## How-To
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Setup a new Laravel application
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+```shell script
+$ laravel new slack-integration
+$ composer require laravel/ui
+$ php artisan ui vue --auth
+$ npm install
+```
+The above commands will provide an empty, authentication-aware, Laravel
+application.
 
-## Learning Laravel
+```sql
+create schema slack_integration;
+```
+This will create the `slack_integration` schema in your RDBMS.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Make sure to update the `.env` file accordingly (`DB_DATABASE`) and make sure
+the `DB_PASSWORD` is set correctly.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```shell script
+php artisan migrate --step
+```
+I am fuzzy about the ability to rollback each individual migration, so I always
+use `--step`.
 
-## Laravel Sponsors
+Start two shells, and run `npm run watch` in one and `php artisan serve` in the
+other.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+You should be to see the normal Laravel welcome screen:
+![Laravel Home Page](storage/doc/images/laravelHomePage.png)
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-- [We Are The Robots Inc.](https://watr.mx/)
-- [Understand.io](https://www.understand.io/)
-- [Abdel Elrafa](https://abdelelrafa.com)
-- [Hyper Host](https://hyper.host)
-- [Appoly](https://www.appoly.co.uk)
-- [OP.GG](https://op.gg)
+Go ahead and register, which will ultimately lead to you being logged in.
 
-## Contributing
+### Publishing the app as it is
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+In order to integrate with Slack, we need to have this application available and
+accessible via the Internet. Since my home office network is strongly
+firewalled, I will publish this application on my Laravel Forge managed server,
+by simply adding a new site to Laravel Forge, and setting it to pick this
+repository's master branch. I will also create an appropriate database and user,
+configure the .env correctly and tell Forge to enable auto-updates.
+ 
+Head over to your trusted DNS service, and add an entry for your new
+application:
+![Create DNS Record](storage/doc/images/createDnsRecord.png)
 
-## Code of Conduct
+Create a new site in Laravel Forge:
+![Create new Forge Site](storage/doc/images/createNewSite.png)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+After a while, the setup of the new site has completed:
+![Site setup is completed](storage/doc/images/siteCreated.png)
 
-## Security Vulnerabilities
+Create a new database and a new user:
+![Create new database](storage/doc/images/createDatabase.png)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Now link the new site to your application's code repository in Forge by clicking
+on the Git Repository button in the dashboard of your newly created site, and
+provide the necessary information:
+![Link to Git Repository](storage/doc/images/linkToGitRepository.png)
 
-## License
+When the installation is finished, change the Deploy Script to the following:
+```shell script
+cd /home/forge/www.slack-integration.test.itpassion.com
+git pull origin master
+composer install --no-interaction --prefer-dist --optimize-autoloader
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+npm install
+npm run prod
+
+( flock -w 10 9 || exit 1
+    echo 'Restarting FPM...'; sudo -S service php7.3-fpm reload ) 9>/tmp/fpmlock
+
+if [ -f artisan ]; then
+    php artisan migrate --force
+fi
+```
+
+Edit the environment and make sure the database related settings are correct.
+
+For Slack integration, you will need to have SSL enabled on your site. Forge
+makes this very simple, as it can create LetsEncrypt SSL Certificates for any
+installed site.
+![Create SSL Certificate](storage/doc/images/createSslCertificate.png)
+
+Deploy the application by clicking the "Deploy Now" button in the "Deployment"
+section on the site "Apps" dashboard.
+
+When the deployment finished successfully, visit the website you've just set up.
+Register a user, and make sure you can login.
+
+### Slack Integration
+
+Slack integration itself is explained
+[here](https://api.slack.com/interactivity/slash-commands).
+ 
+First of all, create a Slack application:
+![Create Slack Application](storage/doc/images/createSlackApp.png)
+ 
+Then in the application's management dashboard, click the Slash Commands link
+and create a new command
+![Create Slash Command Link](storage/doc/images/clickSlashCommandsLink.png)
+![Create New Command](storage/doc/images/createNewCommand.png)
+ 
+We do need a request URL where Slack can POST information to. We will use
+https://www.slack-integration.test.itpassion.com/slack/slash/command.
+Our web application does not have this route configured yet, but we will get
+there in a minute.
+
+For now, just provide the required information and click "Save". 
+
+### Setup the route in the Laravel Application
+
+We need a Controller that will to the `/slack/slash/command` route.
+
+```shell script
+php artisan make:controller SlashCommandController
+```
+
+In your `routes/web.php` include the following route
+```php
+Route::post('/slack/slash/command', 'SlashCommandController@execute')
+    ->name('slashCommand.execute')
+    ->middleware('guest');
+```
+
+Write the `execute` member of the `SlashCommandController`:
+```php
+    public function execute(Request $request)
+    {
+        Log::info(__METHOD__);
+
+        Log::debug('Slack sent us the following information:');
+        $input = $request->all();
+        foreach($input as $key => $value) {
+            Log::debug('"' . $key . '" = "' . $value . '"');
+        }
+
+        Log::debug('We are not doing anything with this command at this ' .
+            'moment.');
+    }
+```
+
+Push this change to git, and make sure the application is deployed automatically
+by Forge.

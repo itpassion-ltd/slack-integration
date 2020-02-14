@@ -18,3 +18,7 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
+
+Route::post('/slack/slash/command', 'SlashCommandController@execute')
+    ->name('slashCommand.execute')
+    ->middleware('guest');

@@ -1,7 +1,7 @@
 {
-    "name": "laravel/laravel",
+    "name": "itpassion-ltd/slack-integration",
     "type": "project",
-    "description": "The Laravel Framework.",
+    "description": "Integrate Slack App (for Slash Commands and other things) with a Laravel API.",
     "keywords": [
         "framework",
         "laravel"
