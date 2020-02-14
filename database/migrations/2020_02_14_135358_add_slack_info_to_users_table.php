@@ -15,7 +15,7 @@ class AddSlackInfoToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('slack_user_id')
-                ->after('slack_nonce')
+                ->after('remember_token')
                 ->nullable();
         });
     }
