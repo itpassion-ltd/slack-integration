@@ -151,5 +151,16 @@ Write the `execute` member of the `SlashCommandController`:
     }
 ```
 
-Push this change to git, and make sure the application is deployed automatically
-by Forge.
+Include the URI `/slack/slash/command` in the `$except` array in the
+`VerifyCsrfToken` middelware:
+```php
+    protected $except = [
+        '/slack/slash/command'
+    ];
+```
+
+Push these changes to git, and make sure the application is deployed
+automatically by Forge.
+
+Next, in the application management dashboard on Slack, mare sure to install the
+application into the desired Slack workspace.
