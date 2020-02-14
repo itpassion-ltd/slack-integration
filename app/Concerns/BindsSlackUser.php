@@ -31,7 +31,7 @@ trait BindsSlackUser
         if(!$user) {
             Log::debug('Slack user "' . $slackUserId . '" has not been bound ' .
                 'to an internal user record...');
-            return $this->createNonceAndAbort($slackUserId);
+            return $this->createNonce($slackUserId);
         } else {
             Log::debug('This is a known user with ID #' . $user->id);
             Auth::login($user);
@@ -49,7 +49,7 @@ trait BindsSlackUser
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      * @throws \Exception
      */
-    public function createNonceAndAbort(string $slackUserId)
+    public function createNonce(string $slackUserId)
     {
         SlackNonce::where('slack_user_id', $slackUserId)->delete();
 

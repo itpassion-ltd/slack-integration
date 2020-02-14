@@ -199,4 +199,19 @@ so that the application can run the command under the appropriate authorization
 levels.
 
 First of all, the Controller responding to the in-coming Slash Command must
-verify whether or not  
+verify whether or not the Laravel Application knows the Slack User ID. If not,
+it must respond with a guarded URL that will allow the Laravel Application to
+identify the Slack User. See `BindsSlackUser` for the implementation of this,
+together with the `routes/web.php`  file.
+
+The URL is displayed to the Slack user using an ephemeral message. The user
+clicks on the link, and, within your Laravel Application, provides the
+credentials necessary to log in. Laravel automatically redirects the user back
+to the original URL. The `SlackBindUserController` then stores the Slack User ID
+within the `User` model, so that subsequent slash commands submitted by this
+user will pass the `actAsSlackUser` and be therefore a known `Auth::user()` in
+the Laravel application.
+
+The `SlashCommandController` uses `BindsSlackUser` to act as an internal user,
+and upon success displays the user's internally registered email address as an
+example.
