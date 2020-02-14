@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Concerns\BindsSlackUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class SlashCommandController extends Controller
@@ -26,6 +27,7 @@ class SlashCommandController extends Controller
 
         // Execute the command...
 
-        return response('Command executed!', 200);
+        return response('Your registered email is: "' . Auth::user()->email .
+            '"', 200);
     }
 }
